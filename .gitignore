@@ -1,0 +1,6 @@
+# Prepared resources are private, machine-local and NEVER committed.
+.local/
+
+# Build output
+dist/
+*.log

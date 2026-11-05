@@ -1,0 +1,5 @@
+{
+  "$comment": "Zenith's pin file. SHA1 pins for the user's own Minecraft Java Edition 26.3 client jar, server jar, version JSON and asset index. zenith-prepare verifies every input against these pins; prepared resources land in gitignored .local/ and are never committed.",
+  "pinned_version": "26.3",
+  "pins": {}
+}
