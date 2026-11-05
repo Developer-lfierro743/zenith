@@ -10,7 +10,8 @@ Target: Minecraft: Java Edition **26.3** (pinned in `internal/version`, mirrored
 ## M1 — Protocol client joins real servers
 The fastest playable win: we only own the client side; the server keeps the hard logic.
 - `internal/protocol`: framing, VarInt/VarLong, compression (zlib), login → configuration → play states
-- Handshake + status ping, login with MS session token, keepalive, chat
+- [x] Handshake + status ping — `zenith-client ping HOST [PORT]`, fake-server tested, CI
+- [ ] Login with MS session token, keepalive, chat
 - Chunk decode: paletted sections, block states, light, entities
 - Milestone test: stand in a world on a real server and see chunks render flat-colored
 

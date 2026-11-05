@@ -1,5 +1,7 @@
 # Zenith
 
+[![CI](https://github.com/Developer-lfierro743/zenith/actions/workflows/ci.yml/badge.svg)](https://github.com/Developer-lfierro743/zenith/actions/workflows/ci.yml)
+
 Minecraft: Java Edition 26.3, reimplemented from scratch in Go — the point directly above the horizon. 😏
 
 Same worlds, same rules, same protocol. Built clean-room, driven by data prepared from **your own copy** of the game, and checked against vanilla with differential harnesses. Free, open source and unofficial.
@@ -21,7 +23,7 @@ A Go port of the *approach* behind [Horizon](https://github.com/horizon-rust/hor
 **Pre-alpha skeleton.** Roadmap and milestones: [docs/ROADMAP.md](docs/ROADMAP.md).
 
 - [x] M0 — repo skeleton, pinned target version
-- [ ] M1 — protocol client: join a real vanilla/Fabric server
+- [ ] M1 — protocol client: join a real vanilla/Fabric server *(status ping ✅)*
 - [ ] M2 — launcher: MS auth + piston-meta
 - [ ] M3 — prepare: data-gen pipeline
 - [ ] M4 — rendering: chunk meshes, vanilla lighting
