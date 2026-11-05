@@ -83,3 +83,87 @@ func ReadString(data []byte) (string, int, error) {
 	}
 	return string(buf), len(data) - br.Len(), nil
 }
+
+// readVarIntN reads a VarInt from data and reports its encoded length.
+func readVarIntN(data []byte) (int32, int, error) {
+	var result uint32
+	for i := 0; i < 5 && i < len(data); i++ {
+		result |= uint32(data[i]&0x7f) << (7 * i)
+		if data[i]&0x80 == 0 {
+			return int32(result), i + 1, nil
+		}
+	}
+	if len(data) >= 5 {
+		return 0, 0, ErrVarIntTooBig
+	}
+	return 0, 0, io.ErrUnexpectedEOF
+}
+
+// fieldReader walks the fields of a packet payload left to right.
+type fieldReader struct {
+	data []byte
+	off  int
+}
+
+func newFieldReader(data []byte) *fieldReader { return &fieldReader{data: data} }
+
+func (r *fieldReader) varInt() (int32, error) {
+	v, n, err := readVarIntN(r.data[r.off:])
+	if err != nil {
+		return 0, err
+	}
+	r.off += n
+	return v, nil
+}
+
+// fixed returns the next n bytes.
+func (r *fieldReader) fixed(n int) ([]byte, error) {
+	if n < 0 || r.off+n > len(r.data) {
+		return nil, io.ErrUnexpectedEOF
+	}
+	b := r.data[r.off : r.off+n]
+	r.off += n
+	return b, nil
+}
+
+func (r *fieldReader) str() (string, error) {
+	v, n, err := readVarIntN(r.data[r.off:])
+	if err != nil {
+		return "", err
+	}
+	if v < 0 || r.off+n+int(v) > len(r.data) {
+		return "", fmt.Errorf("protocol: string length %d exceeds packet data", v)
+	}
+	out := string(r.data[r.off+n : r.off+n+int(v)])
+	r.off += n + int(v)
+	return out, nil
+}
+
+// byteSlice reads a length-prefixed array of bytes.
+func (r *fieldReader) byteSlice() ([]byte, error) {
+	v, n, err := readVarIntN(r.data[r.off:])
+	if err != nil {
+		return nil, err
+	}
+	if v < 0 || r.off+n+int(v) > len(r.data) {
+		return nil, fmt.Errorf("protocol: byte array length %d exceeds packet data", v)
+	}
+	out := append([]byte(nil), r.data[r.off+n:r.off+n+int(v)]...)
+	r.off += n + int(v)
+	return out, nil
+}
+
+func (r *fieldReader) boolean() (bool, error) {
+	b, err := r.fixed(1)
+	if err != nil {
+		return false, err
+	}
+	return b[0] != 0, nil
+}
+
+func (r *fieldReader) uuid() ([16]byte, error) {
+	b, err := r.fixed(16)
+	var u [16]byte
+	copy(u[:], b)
+	return u, err
+}
